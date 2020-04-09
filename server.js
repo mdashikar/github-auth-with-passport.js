@@ -2,30 +2,34 @@ require('dotenv').config();
 
 var express = require('express');
 var passport = require('passport');
-var Strategy = require('passport-facebook').Strategy;
+var GitHubStrategy = require('passport-github').Strategy;
 
-
-// Configure the Facebook strategy for use by Passport.
+// Configure the Github strategy for use by Passport.
 //
 // OAuth 2.0-based strategies require a `verify` function which receives the
-// credential (`accessToken`) for accessing the Facebook API on the user's
+// credential (`accessToken`) for accessing the Github API on the user's
 // behalf, along with the user's profile.  The function must invoke `cb`
 // with a user object, which will be set at `req.user` in route handlers after
 // authentication.
-passport.use(new Strategy({
-    clientID: process.env['FACEBOOK_CLIENT_ID'],
-    clientSecret: process.env['FACEBOOK_CLIENT_SECRET'],
-    callbackURL: '/return'
-  },
-  function(accessToken, refreshToken, profile, cb) {
-    // In this example, the user's Facebook profile is supplied as the user
-    // record.  In a production-quality application, the Facebook profile should
-    // be associated with a user record in the application's database, which
-    // allows for account linking and authentication with other identity
-    // providers.
-    return cb(null, profile);
-  }));
 
+
+passport.use(new GitHubStrategy({
+        clientID: 'Github Client Id',
+        clientSecret: 'Github Client Secret',
+        callbackURL: "http://127.0.0.1:3000/auth/github/callback"
+    },
+    function(accessToken, refreshToken, profile, cb) {
+        // User.findOrCreate({ githubId: profile.id }, function(err, user) {
+        //     return cb(err, user);
+        // });
+        if (profile) {
+            user = profile;
+            return cb(null, user);
+        } else {
+            return cb(null, false);
+        }
+    }
+));
 
 // Configure Passport authenticated session persistence.
 //
@@ -37,11 +41,11 @@ passport.use(new Strategy({
 // example does not have a database, the complete Facebook profile is serialized
 // and deserialized.
 passport.serializeUser(function(user, cb) {
-  cb(null, user);
+    cb(null, user);
 });
 
 passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
+    cb(null, obj);
 });
 
 
@@ -67,28 +71,30 @@ app.use(passport.session());
 
 // Define routes.
 app.get('/',
-  function(req, res) {
-    res.render('home', { user: req.user });
-  });
+    function(req, res) {
+        res.render('home', { user: req.user });
+    });
 
 app.get('/login',
-  function(req, res){
-    res.render('login');
-  });
+    function(req, res) {
+        res.render('login');
+    });
 
-app.get('/login/facebook',
-  passport.authenticate('facebook'));
+app.get('/auth/github',
+    passport.authenticate('github'));
 
-app.get('/return', 
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
-  function(req, res) {
-    res.redirect('/');
-  });
+app.get('/auth/github/callback',
+    passport.authenticate('github', { failureRedirect: '/login' }),
+    function(req, res) {
+        // Successful authentication, redirect home.
+        res.redirect('/');
+    });
+
 
 app.get('/profile',
-  require('connect-ensure-login').ensureLoggedIn(),
-  function(req, res){
-    res.render('profile', { user: req.user });
-  });
+    require('connect-ensure-login').ensureLoggedIn(),
+    function(req, res) {
+        res.render('profile', { user: req.user });
+    });
 
-app.listen(process.env['PORT'] || 8080);
+app.listen(process.env['PORT'] || 3000);
