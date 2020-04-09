@@ -1,21 +1,18 @@
 {
-    "name": "express-4.x-facebook-example",
+    "name": "express-4.x-github-example",
     "version": "0.0.0",
-    "description": "Express 4.x app using Passport for authentication with Facebook.",
+    "description": "Express 4.x app using Passport for authentication with Github.",
     "keywords": [
         "example",
         "express",
         "passport"
     ],
-    "author": "Jared Hanson",
+    "author": "Md. Ashiqur Rahman",
     "license": "Unlicense",
-    "homepage": "https://github.com/passport/express-4.x-facebook-example",
+    "homepage": "https://github.com/mdashikar/github-auth-with-passport.js/",
     "repository": {
         "type": "git",
-        "url": "git://github.com/passport/express-4.x-facebook-example.git"
-    },
-    "bugs": {
-        "url": "https://github.com/passport/express-4.x-facebook-example/issues"
+        "url": "git://github.com/mdashikar/github-auth-with-passport.js/"
     },
     "dependencies": {
         "body-parser": "^1.13.2",
